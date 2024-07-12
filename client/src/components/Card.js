@@ -5,7 +5,10 @@ import { downloadImage } from "../utils";
 import { FaTrash } from "react-icons/fa";
 import { dateConversion } from "../utils/dateConversion";
 
-const Card = ({ id, creator, prompt, photoUrl, createdDate, user }) => {
+const Card = ({ id, creator, prompt, photoUrl, createdDate, username }) => {
+  const IP = "18.116.112.252";
+  const PORT = "8080";
+
   const confirmDeletion = () => {
     const confirmation = window.confirm(
       "Are you sure you want to delete this post?"
@@ -14,9 +17,10 @@ const Card = ({ id, creator, prompt, photoUrl, createdDate, user }) => {
       deletePost();
     }
   };
+
   const deletePost = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/posts/${id}`, {
+      const response = await fetch(`http://${IP}:${PORT}/api/v1/posts/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +66,7 @@ const Card = ({ id, creator, prompt, photoUrl, createdDate, user }) => {
                 className="w-6 h-6 object-contain invert"
               />
             </button>
-            {user === creator && (
+            {username === creator && (
               <FaTrash
                 onClick={confirmDeletion}
                 className="w-6 h-6 text-white bg-transparent hover:text-red-500 hover:cursor-pointer"

@@ -1,23 +1,31 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { FaEye, FaEyeSlash, FaHome } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
-import SweetAlert2 from "react-sweetalert2";
+import { UserContext } from "../App";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
+  const { user, setUser } = useContext(UserContext);
+
+  const IP = "18.116.112.252";
+  const PORT = "8080";
+
   const navigate = useNavigate();
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  let isButtonDisabled = usernameOrEmail.length === 0 || password.length < 6;
+  let isButtonDisabled =
+    usernameOrEmail.length === 0 || password.length < 6 || isLoading;
 
   const handleLogIn = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/log-in", {
+      const response = await fetch(`http://${IP}:${PORT}/api/v1/auth/log-in`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,11 +36,14 @@ const Login = () => {
         }),
       });
       const responseData = await response.json();
+      console.log(responseData);
       if (responseData.token) {
         localStorage.setItem("token", responseData.token);
+        const decoded = jwtDecode(responseData.token);
+        setUser(decoded.username);
         navigate("/");
       } else {
-        alert("Invalid Credientals");
+        setErrorMessage(responseData.message || "Invalid credentials");
       }
     } catch (error) {
       console.log(error);
@@ -63,6 +74,9 @@ const Login = () => {
               >
                 Username or Email
               </label>
+              {errorMessage === "Username or email not found" && (
+                <p className={`text-xs text-red-500`}>{errorMessage}</p>
+              )}
               <input
                 type="text"
                 id="usernameOrEmail"
@@ -83,6 +97,7 @@ const Login = () => {
                 >
                   Password
                 </label>
+
                 <div className="hover:cursor-pointer">
                   {passwordVisible ? (
                     <FaEyeSlash
@@ -99,6 +114,9 @@ const Login = () => {
                   )}
                 </div>
               </div>
+              {errorMessage === "Invalid credentials" && (
+                <p className={`text-xs text-red-500`}>{errorMessage}</p>
+              )}
               <input
                 type={!passwordVisible ? "password" : "text"}
                 id="password"

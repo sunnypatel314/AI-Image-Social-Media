@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { FaEye, FaEyeSlash, FaHome } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 // import SweetAlert2 from "react-sweetalert2";
+import { UserContext } from "../App";
+import { jwtDecode } from "jwt-decode";
 
 const Signup = () => {
   const navigate = useNavigate();
+
+  const { user, setUser } = useContext(UserContext);
+
+  const IP = "18.116.112.252";
+  const PORT = "8080";
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +43,7 @@ const Signup = () => {
   const handleLoginAfterSigningUp = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/log-in", {
+      const response = await fetch(`http://${IP}:${PORT}/api/v1/auth/log-in`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,6 +56,8 @@ const Signup = () => {
       const responseData = await response.json();
       if (responseData.token) {
         localStorage.setItem("token", responseData.token);
+        const decoded = jwtDecode(responseData.token);
+        setUser(decoded.username);
         navigate("/");
       } else {
         alert("Invalid Credientals. Please try again.");
@@ -63,20 +73,17 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/v1/auth/sign-up",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: username.trim(),
-            email: email.trim(),
-            password,
-          }),
-        }
-      );
+      const response = await fetch(`http://${IP}:${PORT}/api/v1/auth/sign-up`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          email: email.trim(),
+          password,
+        }),
+      });
       const responseData = await response.json();
       if (responseData.success) {
         setIsLoading(false);

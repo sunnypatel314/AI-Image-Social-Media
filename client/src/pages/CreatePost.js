@@ -1,25 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { preview } from "../assets";
 import { getRandomPrompt } from "../utils";
 import FormField from "../components/FormField";
 import Loader from "../components/Loader";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { UserContext } from "../App";
+import { jwtDecode } from "jwt-decode";
 
 const CreatePost = () => {
   const navigate = useNavigate();
+
+  const { user, setUser } = useContext(UserContext);
+
   const [form, setForm] = useState({ prompt: "", photo: "", name: "" });
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [isUser, setIsUser] = useState(
-    localStorage.getItem("token") ? true : false
-  );
+
+  const IP = "18.116.112.252";
+  const PORT = "8080";
+
+  useEffect(() => {
+    const checkToken = () => {
+      if (localStorage.getItem("token") && !user) {
+        const decoded = jwtDecode(localStorage.getItem("token"));
+        setUser(decoded.username);
+      }
+    };
+    checkToken();
+  }, []);
 
   const logOut = () => {
-    if (localStorage.getItem("token")) {
-      localStorage.removeItem("token");
-    }
+    localStorage.removeItem("token");
+    setUser("");
     navigate("/log-in");
   };
 
@@ -29,7 +43,7 @@ const CreatePost = () => {
       setLoading(true);
       setIsDisabled(true);
       try {
-        const response = await fetch("http://localhost:8080/api/v1/posts", {
+        const response = await fetch(`http://${IP}:${PORT}/api/v1/posts`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -61,7 +75,7 @@ const CreatePost = () => {
       try {
         setGeneratingImg(true);
         setIsDisabled(true);
-        const response = await fetch("http://localhost:8080/api/v1/dalle", {
+        const response = await fetch(`http://${IP}:${PORT}/api/v1/dalle`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -84,27 +98,17 @@ const CreatePost = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const getUser = () => {
-  //     const token = localStorage.getItem("token") || null;
-  //     if (token) {
-  //       setIsUser(true);
-  //     }
-  //   };
-  //   getUser();
-  // }, []);
-
   return (
     <>
       <Navbar logOut={logOut} page={"CreatePost"} />
-      <main className="sm:p-8 px-4 py-8 w-full bg-[#f9fafe] min-h-[calc(100vh-73px)]">
+      <main className="sm:p-8 px-4 py-8 w-full bg-[#20B2AA] min-h-[calc(100vh-73px)]">
         <section className="max-w-7xl mx-auto">
           <div>
             <h1 className="font-extrabold text-[#222328] text-[32px] text-center">
               Create Image
             </h1>
-            <p className="mt-2 text-[#666e75] text-[18px] text-center w-full">
-              {!isUser ? "Log in to start creating" : "Create"} imaginative and
+            <p className="mt-2 text-[#222328] text-[18px] text-center w-full">
+              {!user ? "Log in to start creating" : "Create"} imaginative and
               visually stunning images generated through DALLE-AI and share them
               with the community.
             </p>
@@ -154,27 +158,27 @@ const CreatePost = () => {
             <div className="mt-5 w-full flex items-center justify-center gap-5">
               <button
                 type="button"
-                disabled={isDisabled || (!form.prompt && isUser)}
+                disabled={isDisabled || (!form.prompt && user)}
                 onClick={() => {
-                  if (isUser) {
+                  if (user) {
                     generateImage();
                   } else {
                     navigate("/log-in");
                   }
                 }}
                 className={`text-white ${
-                  form.prompt || !isUser ? "bg-green-600" : "bg-gray-400"
+                  form.prompt || !user ? "bg-green-600" : "bg-gray-400"
                 }  font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center`}
               >
                 {generatingImg
                   ? "Generating..."
-                  : !isUser
+                  : !user
                   ? "Log in to generate images"
                   : "Generate"}
               </button>
             </div>
             <div className="mt-10 flex flex-col items-center justify-center">
-              <p className="mt-2 text-[#666e75] text-[14px]">
+              <p className="mt-2 text-[#222328] text-[14px]">
                 ** Once you have created the image you want, you can share it
                 with others in the community **
               </p>

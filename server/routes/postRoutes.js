@@ -32,7 +32,6 @@ function authToken(req, res, next) {
 // GET ALL POSTS
 router.route("/").get(authToken, async (req, res) => {
   try {
-    // const posts = await Post.find({});
     const sqlQueryExecutor = await pool.query("SELECT * FROM posts");
     const posts = sqlQueryExecutor.rows;
 
@@ -49,16 +48,9 @@ router.route("/").post(authToken, async (req, res) => {
   try {
     const { prompt, photo, name } = req.body;
     const photoUrl = await cloudinary.uploader.upload(photo);
-    // console.log(req.user.username);
-    // const newPost = await Post.create({
-    //   name: req.user.username,
-    //   prompt,
-    //   photo: photoUrl.url,
-    //   postId: Date.now(),
-    // });
-
+    
     const sqlQueryExecutor = await pool.query(
-      "INSERT INTO posts (creator, prompt, photo_url) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO posts (creator, prompt, photo_url) VALUES ($1, $2, $3)",
       [req.user.username, prompt, photoUrl.url]
     );
     const newPost = sqlQueryExecutor.rows[0];
@@ -73,16 +65,7 @@ router.route("/").post(authToken, async (req, res) => {
 router.route("/:id").delete(async (req, res) => {
   try {
     const id = req.params.id;
-    // const post = await Post.findOne({ postId, name: req.user.username });
     const postToDelete = await pool.query(`DELETE FROM posts WHERE id = ${id}`);
-    // if (!postToDelete) {
-    //   console.log("deletion failed");
-    //   res.status(404).json({ error: "Item not found" });
-    //   return;
-    // }
-    // await Post.deleteOne({ postId, name: req.user.username });
-
-    console.log("deletion successful");
     res.status(204).send();
   } catch (error) {
     console.log(error);

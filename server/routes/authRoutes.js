@@ -11,10 +11,6 @@ const router = express.Router();
 // LOGIN;
 router.route("/log-in").post(async (req, res) => {
   const { usernameOrEmail, password } = req.body;
-  //   const user = await User.findOne({
-  //     $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-  //   });
-  //SELECT * FROM your_table_name WHERE username = 'variable' OR email = 'variable';
   const sqlQueryExecutor = await pool.query(
     "SELECT * FROM users WHERE username = $1 OR email = $1",
     [usernameOrEmail]
@@ -36,10 +32,13 @@ router.route("/log-in").post(async (req, res) => {
     } else {
       return res
         .status(401)
-        .json({ status: "failed", message: "Invalid credientals" });
+        .json({ status: "failed", message: "Invalid credentials" });
     }
   } else {
-    return res.json({ status: "error", user: false });
+    return res.json({
+      status: "error",
+      message: "Username or email not found",
+    });
   }
 });
 

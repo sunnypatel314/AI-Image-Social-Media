@@ -1,7 +1,6 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
-import pool from "./services/database.js";
 
 import dalleRoutes from "./routes/dalleRoutes.js";
 import authRoutes from "./routes/authRoutes.js";

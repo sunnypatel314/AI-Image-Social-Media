@@ -1,19 +1,21 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { FaHome, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { logo } from "../assets";
+import { UserContext } from "../App";
 
 export default function Navbar({ logOut, page }) {
+  const { user, setUser } = useContext(UserContext);
   return (
     <header
-      className="w-full flex justify-between items-center bg-white sm:px-8
-    px-1 py-1 border-b border-b-[#e6ebf4]"
+      className="w-full flex justify-between items-center bg-[#20B2AA] sm:px-8
+    px-1 py-1 border-b border-b-[#20B2AA]"
     >
       <Link to={"/"}>
         <img src={logo} alt="logo" className="w-20 object-contain rounded-xl" />
       </Link>
 
-      {localStorage.getItem("token") ? (
+      {user ? (
         <div className="flex flex-row justify-between space-x-3">
           {page === "Home" ? <CreateButton /> : <HomeButton />}
           <LogOutButton logOut={logOut} />
