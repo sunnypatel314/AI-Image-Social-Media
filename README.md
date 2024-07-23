@@ -3,7 +3,7 @@
 
 This application is available for the general public via https://pixel-wizard-ai.netlify.app/.
 
-This documentation is to inform on the technologies used for this web app and to guide on how to run this web app locally.
+This app is hosted on AWS and Netlify but it is possible it run it locally and that is the purpose of this documentation.
 
 
 ## Technologies used on client side
