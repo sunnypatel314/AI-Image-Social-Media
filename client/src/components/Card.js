@@ -6,8 +6,7 @@ import { FaTrash } from "react-icons/fa";
 import { dateConversion } from "../utils/dateConversion";
 
 const Card = ({ id, creator, prompt, photoUrl, createdDate, username }) => {
-  const IP = "18.116.112.252";
-  const PORT = "8080";
+  const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
 
   const confirmDeletion = () => {
     const confirmation = window.confirm(
@@ -20,22 +19,20 @@ const Card = ({ id, creator, prompt, photoUrl, createdDate, username }) => {
 
   const deletePost = async () => {
     try {
-      const response = await fetch(`http://${IP}:${PORT}/api/v1/posts/${id}`, {
+      const response = await fetch(`https://${API_DOMAIN}/api/v1/posts/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log(response.status);
       if (response.status === 204) {
-        console.log("Successfully deleted:");
         window.location.reload();
       } else {
         alert("Something went wrong. Post was not deleted.");
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
+      alert("Something went wrong. Post was not deleted.");
     }
   };
 

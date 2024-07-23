@@ -18,8 +18,7 @@ const CreatePost = () => {
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
-  const IP = "18.116.112.252";
-  const PORT = "8080";
+  const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
 
   useEffect(() => {
     const checkToken = () => {
@@ -43,7 +42,7 @@ const CreatePost = () => {
       setLoading(true);
       setIsDisabled(true);
       try {
-        const response = await fetch(`http://${IP}:${PORT}/api/v1/posts`, {
+        const response = await fetch(`https://${API_DOMAIN}/api/v1/posts`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -75,7 +74,7 @@ const CreatePost = () => {
       try {
         setGeneratingImg(true);
         setIsDisabled(true);
-        const response = await fetch(`http://${IP}:${PORT}/api/v1/dalle`, {
+        const response = await fetch(`https://${API_DOMAIN}/api/v1/dalle`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

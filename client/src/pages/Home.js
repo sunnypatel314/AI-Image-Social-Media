@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { UserContext } from "../App";
 import { jwtDecode } from "jwt-decode";
-// import { jwtDecode } from "jwt-decode";
 
 const RenderCards = ({ data, username }) => {
   if (data?.length > 0) {
@@ -35,8 +34,7 @@ const Home = () => {
   // const [user, setUser] = useState("");
   // const [username, setUsername] = useState("");
 
-  const IP = "18.116.112.252";
-  const PORT = "8080";
+  const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
 
   const navigate = useNavigate();
 
@@ -74,7 +72,7 @@ const Home = () => {
       setLoading(true);
       try {
         if (user) {
-          const response = await fetch(`http://${IP}:${PORT}/api/v1/posts`, {
+          const response = await fetch(`https://${API_DOMAIN}/api/v1/posts`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -90,7 +88,6 @@ const Home = () => {
           }
         }
       } catch (error) {
-        console.log(error.message);
         alert(error);
       } finally {
         setLoading(false);

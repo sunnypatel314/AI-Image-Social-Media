@@ -11,8 +11,7 @@ const Signup = () => {
 
   const { user, setUser } = useContext(UserContext);
 
-  const IP = "18.116.112.252";
-  const PORT = "8080";
+  const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
@@ -20,6 +19,7 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isHandlingSignUp, setIsHandlingSignUp] = useState(false);
   // const [swalProps, setSwalProps] = useState({});
 
   let isButtonDisabled =
@@ -41,9 +41,9 @@ const Signup = () => {
   }
 
   const handleLoginAfterSigningUp = async () => {
-    setIsLoading(true);
+    setIsHandlingSignUp(true);
     try {
-      const response = await fetch(`http://${IP}:${PORT}/api/v1/auth/log-in`, {
+      const response = await fetch(`https://${API_DOMAIN}/api/v1/auth/log-in`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,9 +63,9 @@ const Signup = () => {
         alert("Invalid Credientals. Please try again.");
       }
     } catch (error) {
-      console.log(error);
+      alert(error);
     } finally {
-      setIsLoading(false);
+      setIsHandlingSignUp(false);
     }
   };
 
@@ -73,17 +73,20 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(`http://${IP}:${PORT}/api/v1/auth/sign-up`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          email: email.trim(),
-          password,
-        }),
-      });
+      const response = await fetch(
+        `https://${API_DOMAIN}/api/v1/auth/sign-up`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username.trim(),
+            email: email.trim(),
+            password,
+          }),
+        }
+      );
       const responseData = await response.json();
       if (responseData.success) {
         setIsLoading(false);
@@ -97,7 +100,7 @@ const Signup = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      alert(error);
     } finally {
       setIsLoading(false);
     }
@@ -113,9 +116,13 @@ const Signup = () => {
           <FaHome />
         </Link>
         <h2 className="text-2xl font-semibold mb-4 text-blue-700 text-center">
-          {isLoading ? "Creating your account..." : "Sign Up"}
+          {isLoading
+            ? "Creating your account..."
+            : isHandlingSignUp
+            ? "Signing in"
+            : "Sign Up"}
         </h2>{" "}
-        {!isLoading ? (
+        {!isLoading || isHandlingSignUp ? (
           <form>
             <div className="mb-4">
               <label

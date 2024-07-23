@@ -8,8 +8,7 @@ import { jwtDecode } from "jwt-decode";
 const Login = () => {
   const { user, setUser } = useContext(UserContext);
 
-  const IP = "18.116.112.252";
-  const PORT = "8080";
+  const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
 
   const navigate = useNavigate();
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -25,7 +24,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(`http://${IP}:${PORT}/api/v1/auth/log-in`, {
+      const response = await fetch(`https://${API_DOMAIN}/api/v1/auth/log-in`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,7 +35,6 @@ const Login = () => {
         }),
       });
       const responseData = await response.json();
-      console.log(responseData);
       if (responseData.token) {
         localStorage.setItem("token", responseData.token);
         const decoded = jwtDecode(responseData.token);
@@ -46,7 +44,6 @@ const Login = () => {
         setErrorMessage(responseData.message || "Invalid credentials");
       }
     } catch (error) {
-      console.log(error);
     } finally {
       setIsLoading(false);
     }
